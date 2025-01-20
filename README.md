@@ -66,7 +66,7 @@ The script will:
 - Continue until interrupted with Ctrl+C
 
 ## File Structure
-![image](https://github.com/user-attachments/assets/8682c16a-2d00-4af5-9bff-6e6bae03920c)
+![image](https://github.com/user-attachments/assets/407cee6f-86c9-4f56-8633-74ca7c8fef80)
 
 
 ## Configuration
