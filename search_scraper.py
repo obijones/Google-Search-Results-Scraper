@@ -83,6 +83,45 @@ def perform_search(driver, query):
         # Extra wait time for ads to load
         random_sleep(5, 8)
         
+        # Try to find and print sponsored ads using multiple selectors
+        try:
+            ad_selectors = [
+                "div[aria-label='Ads']",
+                "#tads",
+                "#tadsb",
+                "div.commercial-unit-desktop-top",
+                "div.ad_cclk",
+                "div[data-text-ad='1']",
+                "div.uEierd"  # Common class for ad containers
+            ]
+            
+            found_ads = False
+            print("\nSearching for ads using different selectors...")
+            
+            for selector in ad_selectors:
+                ad_elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                if ad_elements:
+                    print(f"\nFound ads using selector: {selector}")
+                    print("-------------------")
+                    for ad in ad_elements:
+                        try:
+                            # Get the entire text content of the ad
+                            ad_text = ad.text
+                            if ad_text:
+                                print("Ad Content:")
+                                print(ad_text)
+                                print("-------------------")
+                                found_ads = True
+                        except Exception as e:
+                            print(f"Error extracting ad content: {e}")
+                            continue
+            
+            if not found_ads:
+                print("No sponsored ads found with any selector")
+                
+        except Exception as e:
+            print(f"Error extracting ads: {str(e)}")
+        
         # Capture the page content
         page_content = driver.page_source
         if page_content:
