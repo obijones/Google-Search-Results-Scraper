@@ -24,3 +24,90 @@ A Python script that performs automated Google searches and saves the results (i
 ```bash
 git clone https://github.com/yourusername/google-search-scraper.git
 cd google-search-scraper
+```
+
+2. Install required Python packages:
+```bash
+pip install undetected-chromedriver==3.5.3 selenium
+```
+
+3. Install Chrome version 127:
+```bash
+# Remove current Chrome version if exists
+sudo apt remove google-chrome-stable
+
+# Download Chrome version 127
+wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_127.0.6533.119-1_amd64.deb
+
+# Install Chrome
+sudo dpkg -i google-chrome-stable_127.0.6533.119-1_amd64.deb
+sudo apt --fix-broken install
+
+# Prevent automatic updates
+sudo apt-mark hold google-chrome-stable
+```
+
+## Usage
+1. Create a search query file:
+```bash
+echo "your search query" > search_query.txt
+```
+
+2. Run the script:
+```bash
+python3 search_scraper.py
+```
+The script will:
+- Initialize a headless Chrome browser
+- Read the search query from search_query.txt
+- Perform the search on Google
+- Save results in HTML format in the 'search_results' directory
+- Wait for a random interval (60-120 seconds) before the next search
+- Continue until interrupted with Ctrl+C
+
+## File Structure
+google-search-scraper/
+├── search_scraper.py      # Main script
+├── search_query.txt       # Input file for search queries
+├── search_results/        # Directory containing saved HTML results
+│   └── search_results_*.html
+├── README.md
+└── requirements.txt
+
+
+## Configuration
+You can modify the following parameters in the script:
+
+USER_AGENTS: List of user agents to rotate between
+Search intervals in the random.randint(60, 120) call
+Wait times in the random_sleep() function
+
+## Output
+The script creates HTML files in the 'search_results' directory with the following naming convention:
+```bash
+search_results_YYYYMMDD_HHMMSS.html
+```
+Each file contains:
+
+Search metadata (query and timestamp)
+Complete search results including sponsored ads
+Original HTML structure and formatting
+
+Error Handling
+The script includes comprehensive error handling for:
+
+WebDriver initialization failures
+Network issues
+Google detection/blocking
+File system operations
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Disclaimer
+This script is for educational purposes only. Be aware that automated scraping of Google search results may violate Google's terms of service. Use responsibly and at your own risk.
+
+## Known Issues
+May require periodic updates to maintain effectiveness against detection
+Chrome version must match ChromeDriver version (127.x)
+Some anti-bot measures may still detect the automation
