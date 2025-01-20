@@ -26,9 +26,9 @@ git clone https://github.com/yourusername/google-search-scraper.git
 cd google-search-scraper
 ```
 
-2. Install required Python packages:
+2. Install dependencies:
 ```bash
-pip install undetected-chromedriver==3.5.3 selenium
+pip install -r requirements.txt
 ```
 
 3. Install Chrome version 127:
