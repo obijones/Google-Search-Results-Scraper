@@ -66,13 +66,7 @@ The script will:
 - Continue until interrupted with Ctrl+C
 
 ## File Structure
-google-search-scraper/
-├── search_scraper.py      # Main script
-├── search_query.txt       # Input file for search queries
-├── search_results/        # Directory containing saved HTML results
-│   └── search_results_*.html
-├── README.md
-└── requirements.txt
+![image](https://github.com/user-attachments/assets/8682c16a-2d00-4af5-9bff-6e6bae03920c)
 
 
 ## Configuration
