@@ -11,7 +11,9 @@ from datetime import datetime
 USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/120.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) Chrome/120.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) Chrome/119.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Linux; Android 13; SM-S908B) Chrome/120.0.6099.210 Mobile Safari/537.36',
+    'Dalvik/2.1.0 (Linux; U; Android 14; Pixel 8 Build/UQ1A.240105.002)'
 ]
 
 def random_sleep(min_time=2, max_time=5):
@@ -52,88 +54,6 @@ def read_search_query(filename="search_query.txt"):
         print(f"Error: {filename} not found")
         return None
 
-'''
-def perform_search(driver, query):
-    """Perform Google search with humanized behavior"""
-    try:
-        print("Navigating to Google...")
-        driver.get("https://www.google.com/")
-        random_sleep(3, 6)
-        
-        search_box = WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.NAME, "q"))
-        )
-        print("Search box found")
-        
-        search_box.clear()
-        random_sleep(0.5, 1.5)
-        
-        for char in query:
-            search_box.send_keys(char)
-            time.sleep(random.uniform(0.1, 0.4))
-        
-        random_sleep(0.5, 2)
-        search_box.submit()
-        print("Search submitted")
-        
-        # Wait for results and ads to load
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.ID, "main"))
-        )
-        
-        # Extra wait time for ads to load
-        random_sleep(5, 8)
-        
-        # Try to find and print sponsored ads using multiple selectors
-        try:
-            ad_selectors = [
-                "div[aria-label='Ads']",
-                "#tads",
-                "#tadsb",
-                "div.commercial-unit-desktop-top",
-                "div.ad_cclk",
-                "div[data-text-ad='1']",
-                "div.uEierd"  # Common class for ad containers
-            ]
-            
-            found_ads = False
-            print("\nSearching for ads using different selectors...")
-            
-            for selector in ad_selectors:
-                ad_elements = driver.find_elements(By.CSS_SELECTOR, selector)
-                if ad_elements:
-                    print(f"\nFound ads using selector: {selector}")
-                    print("-------------------")
-                    for ad in ad_elements:
-                        try:
-                            # Get the entire text content of the ad
-                            ad_text = ad.text
-                            if ad_text:
-                                print("Ad Content:")
-                                print(ad_text)
-                                print("-------------------")
-                                found_ads = True
-                        except Exception as e:
-                            print(f"Error extracting ad content: {e}")
-                            continue
-            
-            if not found_ads:
-                print("No sponsored ads found with any selector")
-                
-        except Exception as e:
-            print(f"Error extracting ads: {str(e)}")
-        
-        # Capture the page content
-        page_content = driver.page_source
-        if page_content:
-            print(f"Captured {len(page_content)} bytes of content")
-            return page_content
-            
-    except Exception as e:
-        print(f"Error performing search: {str(e)}")
-        print(f"Current URL: {driver.current_url}")
-        return None
-'''
 def save_ads_to_file(ad_content):
     """Save sponsored ads to findings.txt"""
     try:
@@ -148,14 +68,12 @@ def save_ads_to_file(ad_content):
 def perform_search(driver, query):
     """Perform Google search with humanized behavior"""
     try:
-        print("Navigating to Google...")
         driver.get("https://www.google.com/")
         random_sleep(3, 6)
         
         search_box = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.NAME, "q"))
         )
-        print("Search box found")
         
         search_box.clear()
         random_sleep(0.5, 1.5)
@@ -166,7 +84,6 @@ def perform_search(driver, query):
         
         random_sleep(0.5, 2)
         search_box.submit()
-        print("Search submitted")
         
         # Wait for results and ads to load
         WebDriverWait(driver, 20).until(
@@ -197,11 +114,12 @@ def perform_search(driver, query):
                         try:
                             ad_text = ad.text
                             if ad_text:
-                                print("Ad Content:")
+                                print("\nAd Content:")
+                                print("======================")
                                 print(ad_text)
-                                print("-------------------")
+                                print("======================\n")
                                 # Save ad to findings.txt
-                                save_ads_to_file(f"Ad Content:\n{ad_text}\n-------------------\n")
+                                save_ads_to_file(f"\nAd Content:\n======================\n{ad_text}\n======================\n")
                         except Exception as e:
                             continue
                             
@@ -219,18 +137,33 @@ def perform_search(driver, query):
         print(f"Current URL: {driver.current_url}")
         return None
 
-def save_results(html_content, query):
+def save_results(html_content, query, driver):
     """Save the search results to an HTML file with timestamp"""
     if not html_content:
         print("No content to save")
         return
         
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename_prefix = ""
+    # Check for ads using same selectors as in perform_search()
+    ad_selectors = [
+        "div[aria-label='Ads']",
+        "#tads",
+        "#tadsb",
+        "div.commercial-unit-desktop-top",
+        "div.ad_cclk",
+        "div[data-text-ad='1']",
+        "div.uEierd"
+    ]
+    for selector in ad_selectors:
+        if driver.find_elements(By.CSS_SELECTOR, selector):
+            filename_prefix = "ad_"
+            break
     
     if not os.path.exists('search_results'):
         os.makedirs('search_results')
     
-    filename = f"search_results/search_results_{timestamp}.html"
+    filename = f"search_results/{filename_prefix}search_results_{timestamp}.html"
     
     try:
         formatted_html = f"""<!DOCTYPE html>
@@ -266,7 +199,6 @@ def main():
                 random_sleep(3, 7)
             
             driver = setup_driver()
-            print("Browser initialized")
             
             query = read_search_query()
             if not query:
@@ -278,7 +210,7 @@ def main():
             
             html_content = perform_search(driver, query)
             if html_content:
-                save_results(html_content, query)
+                save_results(html_content, query, driver)
             
             delay = random.randint(60, 120)
             print(f"Waiting {delay} seconds before next search...")
